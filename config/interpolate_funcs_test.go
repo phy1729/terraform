@@ -1506,6 +1506,36 @@ func TestInterpolateFuncJSONEncode(t *testing.T) {
 	})
 }
 
+func TestInterpolateFuncRange(t *testing.T) {
+	testFunction(t, testFunctionConfig{
+		Cases: []testFunctionCase{
+			{
+				`${range(4)}`,
+				[]interface{}{0, 1, 2, 3},
+				false,
+			},
+
+			{
+				`${range(0)}`,
+				[]interface{}{},
+				false,
+			},
+
+			{
+				`${range(-1)}`,
+				nil,
+				true,
+			},
+
+			{
+				`${range("phy")}`,
+				nil,
+				true,
+			},
+		},
+	})
+}
+
 func TestInterpolateFuncReplace(t *testing.T) {
 	testFunction(t, testFunctionConfig{
 		Cases: []testFunctionCase{

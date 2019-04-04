@@ -119,6 +119,7 @@ func Funcs() map[string]ast.Function {
 		"pathexpand":   interpolationFuncPathExpand(),
 		"pow":          interpolationFuncPow(),
 		"uuid":         interpolationFuncUUID(),
+		"range":        interpolationFuncRange(),
 		"replace":      interpolationFuncReplace(),
 		"reverse":      interpolationFuncReverse(),
 		"rsadecrypt":   interpolationFuncRsaDecrypt(),
@@ -925,6 +926,33 @@ func interpolationFuncJSONEncode() ast.Function {
 				return "", fmt.Errorf("failed to encode JSON data '%s'", toEncode)
 			}
 			return string(jEnc), nil
+		},
+	}
+}
+
+// interpolationFuncRange implements the "range" function that retuns a
+// list of numbers from 0.
+func interpolationFuncRange() ast.Function {
+	return ast.Function{
+		ArgTypes:   []ast.Type{ast.TypeInt},
+		ReturnType: ast.TypeList,
+		Variadic:   false,
+		Callback: func(args []interface{}) (interface{}, error) {
+			num := args[0].(int)
+
+			if num < 0 {
+				return "", fmt.Errorf("range argument must be positive")
+			}
+
+			list := make([]ast.Variable, num)
+			for idx := range list {
+				list[idx] = ast.Variable{
+					Type:  ast.TypeInt,
+					Value: idx,
+				}
+			}
+
+			return list, nil
 		},
 	}
 }

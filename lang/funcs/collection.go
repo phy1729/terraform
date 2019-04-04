@@ -807,6 +807,34 @@ var MergeFunc = function.New(&function.Spec{
 	},
 })
 
+// RangeFunc takes an int and produces a list of ints.
+var RangeFunc = function.New(&function.Spec{
+	Params: []function.Parameter{
+		{
+			Name: "num",
+			Type: cty.Number,
+		},
+	},
+	Type: function.StaticReturnType(cty.List(cty.Number)),
+	Impl: func(args []cty.Value, retType cty.Type) (ret cty.Value, err error) {
+		var num int
+		if err := gocty.FromCtyValue(args[0], &num); err != nil {
+			return cty.UnknownVal(cty.String), err
+		}
+
+		if num < 0 {
+			return cty.NilVal, fmt.Errorf("range argument must be positive")
+		}
+
+		list := make([]cty.Value, num)
+		for idx := range list {
+			list[idx] = cty.NumberIntVal(int64(idx))
+		}
+
+		return cty.ListVal(list), nil
+	},
+})
+
 // ReverseFunc takes a sequence and produces a new sequence of the same length
 // with all of the same elements as the given sequence but in reverse order.
 var ReverseFunc = function.New(&function.Spec{
